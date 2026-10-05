@@ -1,3 +1,3 @@
-Netlify: https://code-travel.netlify.app/
-GitHub Pages: https://acohon53114.github.io/code-travel/
-Vercel: https://code-travel-opal.vercel.app/
+1. Netlify: https://code-travel.netlify.app/
+2. GitHub Pages: https://acohon53114.github.io/code-travel/
+3. Vercel: https://code-travel-opal.vercel.app/
