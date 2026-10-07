@@ -1,0 +1,6 @@
+@media (max-width: 780px) { .hero-visual { min-height: 465px; }.hero-visual > img { border-radius: 20px; opacity: .48; }.language-select select { padding-top: 7px; padding-bottom: 7px; }.planet-panel { min-height: 530px; }.language-preview { right: 50%; transform: translateX(50%); bottom: -14%; width: min(282px, 88vw); text-align: left; }.pin-6 { left: 48%; top: 55%; }.pin-7 { right: 5%; top: 23%; } }
+
+/* Keep the selected-language card outside the globe so it never covers a pin. */
+.planet-panel { min-height: 710px; display: flex; align-items: flex-start; justify-content: center; padding-top: 24px; }
+.language-preview { right: 50%; bottom: 0; transform: translateX(50%); width: min(320px, 88%); z-index: 5; }
+@media (max-width: 780px) { .planet-panel { min-height: 575px; padding-top: 18px; }.language-preview { right: 50%; bottom: 0; transform: translateX(50%); width: min(282px, 88vw); }.three-globe { min-width: min(74vw, 350px); width: min(74vw, 350px); cursor: default; } }

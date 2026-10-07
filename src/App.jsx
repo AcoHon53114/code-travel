@@ -1,24 +1,35 @@
-import { lazy, Suspense, useEffect, useState } from 'react';
-import { Link, NavLink, Route, Routes, useLocation, useParams } from 'react-router-dom';
-import { frameworkLinks, languages } from './data/languages';
+import { useState } from 'react';
+import { Route, Routes } from 'react-router-dom';
+import Footer from './components/Footer';
+import Header from './components/Header';
+import ScrollToTop from './components/ScrollToTop';
 import { copy, frameworkDescriptions, languageDescriptions } from './data/translations';
+import About from './pages/About';
+import Destinations from './pages/Destinations';
+import Home from './pages/Home';
+import LanguageDetail from './pages/LanguageDetail';
+import Timeline from './pages/Timeline';
 
-const CodePlanet = lazy(() => import('./components/CodePlanet'));
-const publicAsset = (path) => `${import.meta.env.BASE_URL}${path.replace(/^\//, '')}`;
+export default function App() {
+  const [lang, setLang] = useState('en');
+  const t = {
+    ...copy[lang],
+    descriptions: languageDescriptions[lang],
+    frameworkDescriptions: frameworkDescriptions[lang],
+  };
 
-function useDashboardProgress(duration = 1050) { const [progress, setProgress] = useState(0); useEffect(() => { if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) { setProgress(1); return undefined; } const startedAt = performance.now(); let frameId; const tick = (now) => { const elapsed = Math.min((now - startedAt) / duration, 1); setProgress(1 - (1 - elapsed) ** 3); if (elapsed < 1) frameId = requestAnimationFrame(tick); }; frameId = requestAnimationFrame(tick); return () => cancelAnimationFrame(frameId); }, [duration]); return progress; }
-
-function Header({ lang, setLang, t }) { const [menuOpen, setMenuOpen] = useState(false); const closeMenu = () => setMenuOpen(false); return <nav className="navbar"><Link className="brand" to="/" onClick={closeMenu}><span>&lt;/&gt;</span> Code Travel</Link><div className={`nav-links ${menuOpen ? 'mobile-open' : ''}`}><NavLink to="/destinations" onClick={closeMenu}>{t.nav[0]}</NavLink><NavLink to="/timeline" onClick={closeMenu}>{t.nav[1]}</NavLink><NavLink to="/about" onClick={closeMenu}>{t.nav[2]}</NavLink></div><div className="nav-controls"><label className="language-select"><span className="sr-only">Language</span><select value={lang} onChange={(e) => setLang(e.target.value)}><option value="en">EN</option><option value="zh-Hant">繁中</option><option value="zh-Hans">简中</option></select></label><button className="menu-button" aria-label="Open navigation menu" aria-expanded={menuOpen} onClick={() => setMenuOpen((open) => !open)}>{menuOpen ? '×' : '☰'}</button></div></nav>; }
-function Home({ t }) { const [first, focus, last] = t.heroTitle.split('|'); const frameworkTotal = languages.reduce((sum, language) => sum + language.frameworks.length, 0); const progress = useDashboardProgress(); const displayCount = (target) => Math.round(target * progress); return <><section className="hero"><div className="hero-copy"><p className="eyebrow">{t.heroEyebrow}</p><h1>{first}<br /><em>{focus}</em>{last}</h1><p className="intro">{t.heroIntro}</p><div className="hero-actions"><Link className="primary-button" to="/destinations">{t.start} <span>↗</span></Link><Link className="secondary-button" to="/timeline">{t.viewTimeline}</Link></div><dl className="hero-stats"><div><dt>{displayCount(languages.length)}</dt><dd>{t.destinations}</dd></div><div><dt>{displayCount(40)}+</dt><dd>{t.years}</dd></div><div><dt>{displayCount(frameworkTotal)}</dt><dd>{t.frameworks}</dd></div></dl></div><div className="hero-visual"><img src={publicAsset('/assets/code-travel-hero.webp')} alt="A colorful code planet in space" /><Suspense fallback={null}><CodePlanet languages={languages} t={t} /></Suspense></div></section><section className="next-section"><p className="eyebrow">{t.next}</p><h2>{t.nextTitle}</h2></section></>; }
-function PageIntro({ eyebrow, title, intro, image, children }) {
-  const imageUrl = publicAsset(image);
-
-  return <section className="page"><div className="page-banner" style={{ '--page-image': `url(${imageUrl})` }}><div className="page-heading"><p className="eyebrow">{eyebrow}</p><h1>{title}</h1><p>{intro}</p></div></div>{children}</section>; }
-const descriptionFor = (t, language) => t.descriptions[language.slug] || language.description;
-function Destinations({ t }) { const location = useLocation(); const from = location.state?.from || '/destinations'; const label = location.state?.label || t.nav[0]; return <PageIntro image="/assets/destinations-world-map.webp" eyebrow={t.choose} title={t.destinationsTitle} intro={t.destinationsIntro}><div className="destination-grid">{languages.map((x) => <Link to={`/destinations/${x.slug}`} state={{ from, label }} className="destination-card" key={x.slug} style={{ '--card-color': x.color }}><span className="card-mark">{x.short}</span><p className="eyebrow">{x.zone}</p><h2>{x.name}</h2><p>{descriptionFor(t, x)}</p><span className="card-link">{t.explore} →</span></Link>)}</div></PageIntro>; }
-function LanguageDetail({ t }) { const { slug } = useParams(); const location = useLocation(); const x = languages.find((item) => item.slug === slug); const backTo = location.state?.from || '/destinations'; const backLabel = location.state?.label || t.nav[0]; if (!x) return <PageIntro image="/assets/language-passport.webp" eyebrow="404" title="Route not found" intro="Choose another destination." />; return <PageIntro image={x.bannerImage} eyebrow={`${x.zone} ${t.destination}`} title={x.name} intro={descriptionFor(t, x)}><Link className="back-button" to={backTo}>← {backLabel}</Link><div className="detail-layout"><section className="detail-facts"><p><strong>{t.first}</strong>{x.year}</p><p><strong>{t.origin}</strong>{x.origin}</p><p><strong>{t.route}</strong>{x.zone}</p><p className="official-language-link"><strong>{t.officialWebsite}</strong><a href={x.officialUrl} target="_blank" rel="noreferrer">{t.visitLanguageOfficial.replace('{name}', x.name)} <span aria-hidden="true">↗</span></a></p></section><section className="framework-panel"><p className="eyebrow">{t.popular}</p><h2>{t.continue}</h2><div className="framework-list">{x.frameworks.map((f, i) => <a className="framework-card" key={f} href={frameworkLinks[f]} target="_blank" rel="noreferrer" aria-label={`${f}: ${t.visitOfficial}`}><span>0{i + 1}</span><div><h3>{f}</h3><p>{t.frameworkDescriptions[x.slug]?.[f] || t.frameworkText.replace('{name}', x.name)}</p></div><strong className="framework-cta">{t.visitOfficial} <span aria-hidden="true">↗</span></strong></a>)}</div></section></div></PageIntro>; }
-function Timeline({ t }) { return <PageIntro image="/assets/timeline-earth-route.webp" eyebrow={t.timeline} title={t.timelineTitle} intro={t.timelineIntro}><ol className="timeline">{[...languages].sort((a,b) => a.year-b.year).map((x) => <li key={x.slug}><time>{x.year}</time><span className="timeline-dot" style={{ background: x.color }} /><div><p className="eyebrow">{x.zone}</p><h2>{x.name}</h2><p>{descriptionFor(t, x)}</p><Link to={`/destinations/${x.slug}`} state={{ from: '/timeline', label: t.nav[1] }}>{t.explore} →</Link></div></li>)}</ol></PageIntro>; }
-function About({ t }) { return <PageIntro image="/assets/about-code-flight.webp" eyebrow={t.about} title={t.aboutTitle} intro={t.aboutIntro}><section className="about-copy"><p>{t.aboutBody}</p><p>{t.aboutBody2}</p><Link className="primary-button" to="/destinations" state={{ from: '/about', label: t.nav[2] }}>{t.chooseDestination} <span>↗</span></Link></section></PageIntro>; }
-function Footer() { const location = useLocation(); const contentPage = location.pathname.startsWith('/destinations') || ['/timeline', '/about'].includes(location.pathname); return <footer className={`site-footer ${contentPage ? 'site-footer-page' : ''}`}><Link className="footer-home" to="/" aria-label="Return to Code Travel home"><span>Copyright © Code Travel Company {new Date().getFullYear()}.</span><span>All rights reserved.</span></Link></footer>; }
-function ScrollToTop() { const { pathname } = useLocation(); useEffect(() => { window.scrollTo(0, 0); }, [pathname]); return null; }
-export default function App() { const [lang, setLang] = useState('en'); const t = { ...copy[lang], descriptions: languageDescriptions[lang], frameworkDescriptions: frameworkDescriptions[lang] }; return <main><ScrollToTop /><Header lang={lang} setLang={setLang} t={t} /><Routes><Route path="/" element={<Home t={t} />} /><Route path="/destinations" element={<Destinations t={t} />} /><Route path="/destinations/:slug" element={<LanguageDetail t={t} />} /><Route path="/timeline" element={<Timeline t={t} />} /><Route path="/about" element={<About t={t} />} /></Routes><Footer /></main>; }
+  return (
+    <main>
+      <ScrollToTop />
+      <Header lang={lang} setLang={setLang} t={t} />
+      <Routes>
+        <Route path="/" element={<Home t={t} />} />
+        <Route path="/destinations" element={<Destinations t={t} />} />
+        <Route path="/destinations/:slug" element={<LanguageDetail t={t} />} />
+        <Route path="/timeline" element={<Timeline t={t} />} />
+        <Route path="/about" element={<About t={t} />} />
+      </Routes>
+      <Footer />
+    </main>
+  );
+}
