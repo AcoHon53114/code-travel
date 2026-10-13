@@ -33,7 +33,7 @@ history and ecosystems of eight programming languages.
 - Vercel / Netlify
 
 ## Project structure
-
+```
 src/
 ├── assets/
 ├── components/
@@ -53,6 +53,7 @@ src/
 │   ├── pages.css
 │   └── refinements.css
 └── utils/
+```
 
 ## Run locally
 
