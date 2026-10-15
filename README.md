@@ -4,11 +4,13 @@ A responsive React travel-themed website that presents the evolution,
 history and ecosystems of eight programming languages.
 
 ## Live demos
+
 1. Netlify: https://code-travel.netlify.app/
 2. GitHub Pages: https://acohon53114.github.io/code-travel/
 3. Vercel: https://code-travel-opal.vercel.app/
 
 ## Highlights
+
 - Three.js 3D rotating globe
 - Desktop drag interaction; tablet/mobile auto-rotation
 - Traditional Chinese, Simplified Chinese and English
@@ -17,6 +19,7 @@ history and ecosystems of eight programming languages.
 - GitHub Actions CI: lint → build → deploy
 
 ## Pages
+
 1. Home — 3D globe and project overview
 2. Destinations — eight programming-language destinations
 3. Language Detail — history, official website and frameworks
@@ -24,6 +27,7 @@ history and ecosystems of eight programming languages.
 5. About — project concept
 
 ## Tech stack
+
 - React + Vite
 - React Router
 - Three.js
@@ -33,6 +37,7 @@ history and ecosystems of eight programming languages.
 - Vercel / Netlify
 
 ## Project structure
+
 ```
 src/
 ├── assets/
@@ -57,10 +62,14 @@ src/
 
 ## Run locally
 
+```
 npm install
 npm run dev
+```
 
 ## Quality checks
 
+```
 npm run lint
 npm run build
+```
